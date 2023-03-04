@@ -11,7 +11,16 @@ class DifferentiableFunction():
     def __add__(self, other):
         return DifferentiableFunction(lambda x: self.rule(x) + other.rule(x))
     
-class Monomial(DifferentiableFunction):
+    def __sub__(self, other):
+        return DifferentiableFunction(lambda x: self.rule(x) - other.rule(x))
+    
+    def __mul__(self, other):
+        return DifferentiableFunction(lambda x: self.rule(x) * other.rule(x))
+    
+    def __truediv__(self, other):
+        return DifferentiableFunction(lambda x: self.rule(x) / other.rule(x))
+    
+class Monomial1(DifferentiableFunction):
     def base_rule(x, coeff, power):
         terms = (x for i in range(power))
         return coeff * math.prod(terms)
@@ -47,7 +56,7 @@ class Monomial(DifferentiableFunction):
         else:
             return str(self.coeff)
     
-class Polynomial(DifferentiableFunction):
+class Polynomial1(DifferentiableFunction):
     def base_rule(x, coeffs):
         top_power = len(coeffs)
         terms = []
@@ -59,18 +68,23 @@ class Polynomial(DifferentiableFunction):
         self.coeffs = coeffs
         rule = lambda x: Polynomial.base_rule(x, coeffs)
         DifferentiableFunction.__init__(self, rule)
+        top_power = len(coeffs)
+        self.terms = []
+        for i in range(top_power):
+            self.terms.append(Monomial(coeffs[i], top_power - 1 - i))
 
     def __str__(self):
-        top_power = len(self.coeffs)
-        terms = []
-        for i in range(top_power):
-            if self.coeffs[i] == 0:
+        terms_as_strings = list(map(str, self.terms))
+        first_term = ''
+        while first_term == '':
+            lead = terms_as_strings.pop(0)
+            if lead != '0':
+                first_term = lead
+        result = first_term
+        for i in range(len(terms_as_strings)):
+            next_term = terms_as_strings[i]
+            if next_term == '0':
                 continue
-            else:
-                terms.append(str(Monomial(self.coeffs[i], top_power - 1 - i)))
-        result = terms[0]
-        for i in range(1, len(terms)):
-            next_term = terms[i]
             if next_term[0] == '-':
                 new_term = next_term[1:]
                 result += ' - ' + new_term
@@ -80,7 +94,98 @@ class Polynomial(DifferentiableFunction):
     
     def derivative(self):
         pass
-    
-for k in range(5):
-    coeffs = [random.randint(-5,5) for k in range(4)]
-    print(Polynomial(coeffs))
+
+class Polynomial(DifferentiableFunction):
+    def base_rule(x, coeffs):
+        num_of_terms = len(coeffs)
+        terms = (coeffs[i] * x ** (num_of_terms - 1 - i) for i in range(num_of_terms))
+        return sum(terms)
+
+    def __init__(self, coeffs):
+        self.coeffs = coeffs
+        DifferentiableFunction.__init__(self, lambda x: Polynomial.base_rule(x, coeffs))
+
+    def __str__(self):
+        result = ''
+        for position, coeff in enumerate(self.coeffs):
+            power = len(self.coeffs) - 1 - position
+            if coeff == 0:
+                continue
+            if power > 1:
+                if result == '':
+                    if coeff == 1:
+                        first_term = 'x^' + str(power)
+                        result = first_term
+                    elif coeff == -1:
+                        first_term = '-x^' + str(power)
+                        result = first_term
+                    else:
+                        first_term = str(coeff) + 'x^' + str(power)
+                        result = first_term
+                else:
+                    if coeff > 0:
+                        result += ' + '
+                        if coeff == 1:
+                            result += 'x^' + str(power)
+                        else:
+                            result += str(coeff) + 'x^' + str(power)
+                    else:
+                        result += ' - '
+                        if coeff == -1:
+                            result += 'x^' + str(power)
+                        else:
+                            coeff = -coeff
+                            result += str(coeff) + 'x^' + str(power)
+            elif power == 1:
+                if result == '':
+                    if coeff == 1:
+                        first_term = 'x'
+                        result = first_term
+                    elif coeff == -1:
+                        first_term = '-x'
+                        result = first_term
+                    else:
+                        first_term = str(coeff) + 'x'
+                        result = first_term
+                else:
+                    if coeff > 0:
+                        result += ' + '
+                        if coeff == 1:
+                            result += 'x'
+                        else:
+                            result += str(coeff) + 'x'
+                    else:
+                        result += ' - '
+                        if coeff == -1:
+                            result += 'x'
+                        else:
+                            coeff = -coeff
+                            result += str(coeff) + 'x'
+            else:
+                if result == '':
+                    result = str(coeff)
+                else:
+                    if coeff > 0:
+                        result += ' + ' + str(coeff)
+                    else:
+                        coeff = -coeff
+                        result += ' - ' + str(coeff)
+        return result
+
+    def derivative(self):
+        deriv_coeffs = []
+        for position, coeff in enumerate(self.coeffs):
+            power = len(self.coeffs) - 1 - position
+            deriv_coeffs.append(power * coeff)
+        deriv_coeffs.pop()
+        return Polynomial(deriv_coeffs)
+
+
+class Monomial(Polynomial):
+    pass
+
+for j in range(5):
+    f = Polynomial([random.randint(-3,3) for k in range(7)])
+    print("function:", f)
+    print("derivative:", f.derivative())
+    print()
