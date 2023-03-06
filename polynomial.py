@@ -1,3 +1,5 @@
+from main import DifferentiableFunction
+
 class Polynomial(DifferentiableFunction):
     def base_rule(x, coeffs):
         num_of_terms = len(coeffs)
