@@ -1,3 +1,5 @@
+import math
+
 class Exponential(DifferentiableFunction):
     def __init__(self, coeff, base):
         assert base > 0
