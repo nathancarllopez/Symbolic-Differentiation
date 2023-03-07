@@ -155,8 +155,14 @@ class Polynomial(DifferentiableFunction):
 f = Exponential('x', 3, 5)
 g = Polynomial('x', [2, 0, -1])
 h = f + g
-for x in [f,g]:
-    print("Original", x)
-    print("Derivative", x.derivative())
-print("Original", h)
-print("Derivative", h.differentiate())
+
+subtrees = h.structure.get_subtrees_below_root()
+for tree in subtrees:
+    print(tree)
+    print()
+
+# descendants = h.structure.get_descendants(h.structure.root)
+# stems = h.structure.get_children(h.structure.root)
+# for stem in stems:
+#     print(stem)
+#     print()
