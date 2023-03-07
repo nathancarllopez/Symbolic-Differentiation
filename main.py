@@ -3,17 +3,15 @@ import random
 from structure import AlgebraicStructure
 
 class DifferentiableFunction():
-    def __init__(self, rule):
+    def __init__(self, argument, rule):
+        self.argument = argument
         self.rule = rule
-        self.structure = AlgebraicStructure(rule)
-
-    def evaluate(self, input):
-        return self.rule(input)
+        # self.structure = AlgebraicStructure()
     
     def __add__(self, other):
+        assert self.argument == other.argument, "Arguments need to match"
         s_rule = lambda x: self.rule(x) + other.rule(x)
-        s = DifferentiableFunction(s_rule)
-        s.structure = self.structure + other.structure
+        s = DifferentiableFunction(self.argument, s_rule)
         return s
     
     def derivative(self):
@@ -28,3 +26,4 @@ class DifferentiableFunction():
         #   whatever operation is given, and combine the rules labeling
         #   the edges
         return result
+    
