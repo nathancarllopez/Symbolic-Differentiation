@@ -48,7 +48,9 @@ class AlgebraicStructure(WeightedGraph):
             s.weights[key] = self.weights[key]
         for key in other.weights:
             s.weights[key] = other.weights[key]
-        s.add_edge(('+', self.root))
-        s.add_edge(('+', other.root))
+        s.add_edge('+', self.root)
+        s.add_edge('+', other.root)
         return s
 
+    def get_subtrees_below_root(self):
+        pass

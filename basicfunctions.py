@@ -11,22 +11,31 @@ class DifferentiableFunction():
     def __add__(self, other):
         assert self.argument == other.argument, "Arguments need to match"
         s_rule = lambda x: self.rule(x) + other.rule(x)
-        s_structure = self.structre + other.structure
+        s_structure = self.structure + other.structure
         s = DifferentiableFunction(self.argument, s_rule, s_structure)
         return s
     
-    def differentiate(self):
-        result = DifferentiableFunction(lambda x: x)
+    def __mul__(self, other):
+        pass
 
-        # Pseudocode:
-        # 1) Start at the root 'R' of the structure tree
-        # 2) If the child node is 'L', then take the proper derivative of
-        #   the rule attached to the edge (R, L), and return the result
-        # 3) Otherwise, the child node is an operation, e.g., +, -, *, /, comp
-        # 4) Apply the appropriate calculus derivative rule according to
-        #   whatever operation is given, and combine the rules labeling
-        #   the edges
-        return result
+    def __str__(self):
+        result = ''
+        tree = self.structure
+        
+    
+    def differentiate(self):
+        tree = self.structure
+        if tree.root in ['+', '*']:
+            left_subtree, right_subtree = self.get_subtrees_below_root()
+            if tree.root == '+':
+                return DifferentiableFunction.differentiate(left_subtree) + DifferentiableFunction.differentiate(right_subtree)
+            else:
+                return DifferentiableFunction.differentiate(left_subtree) * right_subtree.root + left_subtree.root * DifferentiableFunction.differentiate(right_subtree)
+        elif tree.root in ['-', '/', 'comp']:
+            return 'operation not added yet'
+        else:
+            root_type = type(tree.root)
+            return root_type.derivative(tree.root)
     
 class Exponential(DifferentiableFunction):
     def __init__(self, argument, coeff, base):
@@ -141,5 +150,13 @@ class Polynomial(DifferentiableFunction):
             power = len(self.coeffs) - 1 - position
             deriv_coeffs.append(power * coeff)
         deriv_coeffs.pop()
-        return Polynomial(deriv_coeffs)
+        return Polynomial(self.argument, deriv_coeffs)
     
+f = Exponential('x', 3, 5)
+g = Polynomial('x', [2, 0, -1])
+h = f + g
+for x in [f,g]:
+    print("Original", x)
+    print("Derivative", x.derivative())
+print("Original", h)
+print("Derivative", h.differentiate())
