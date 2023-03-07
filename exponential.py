@@ -7,7 +7,13 @@ class Exponential(DifferentiableFunction):
         assert base > 0, "Base needs to be positive"
         self.coeff = coeff
         self.base = base
-        DifferentiableFunction.__init__(self, argument, lambda x: coeff * math.pow(base, x))
+        structure = AlgebraicStructure(self, [])
+        DifferentiableFunction.__init__(
+            self, 
+            argument, 
+            lambda x: coeff * math.pow(base, x),
+            structure
+            )
 
     def __str__(self):
         if self.base == 1:
@@ -19,3 +25,6 @@ class Exponential(DifferentiableFunction):
     def derivative(self):
         return Exponential(self.argument, round(self.coeff * math.log(self.base), 2), self.base)
 
+f = Exponential('x', 3, 5)
+print(f)
+print(f.structure)

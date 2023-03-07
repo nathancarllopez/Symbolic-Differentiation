@@ -9,7 +9,13 @@ class Polynomial(DifferentiableFunction):
 
     def __init__(self, argument, coeffs):
         self.coeffs = coeffs
-        DifferentiableFunction.__init__(self, argument, lambda x: Polynomial.base_rule(x, coeffs))
+        structure = AlgebraicStructure(self, [])
+        DifferentiableFunction.__init__(
+            self,
+            argument,
+            lambda x: Polynomial.base_rule(x, coeffs),
+            structure
+            )
 
     def __str__(self):
         result = ''
