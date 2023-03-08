@@ -30,9 +30,23 @@ class WeightedGraph():
         self.weights[edge] = new_weight
 
     def __str__(self):
-        vertices_str = "The vertices of the graph are " + str(self.vertices) + ".\n"
-        edges_str = "The edges of the graph are " + str(self.edges) + ".\n"
-        weights_str = "The weights on the edges are " + str(self.weights) + "."
+        vertices_str = 'The vertices of the graph are '
+        vertices_str += ', '.join(list(map(str, self.vertices)))
+        vertices_str += '.\n'
+
+        if len(self.edges) > 0:
+            edges_str = 'The edges of the graph are '
+            edges_str += ','.join(list(map(str, self.edges)))
+            edges_str += '.\n'
+            if len(self.weights) > 0:
+                weights_str = 'The weights on each edge are '
+                weights_str += ','.join(list(map(str, self.weights.items())))
+            else:
+                weights_str = 'None of the edges have weights.'
+        else:
+            edges_str = 'There are no edges.\n'
+            weights_str = ''
+
         return vertices_str + edges_str + weights_str
 
 class AlgebraicStructure(WeightedGraph):

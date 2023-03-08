@@ -18,9 +18,9 @@ class DifferentiableFunction():
     def __mul__(self, other):
         pass
 
-    def __str__(self):
-        result = ''
-        tree = self.structure
+    # def __str__(self):
+    #     result = ''
+    #     tree = self.structure
         
     
     def differentiate(self):
@@ -156,13 +156,12 @@ f = Exponential('x', 3, 5)
 g = Polynomial('x', [2, 0, -1])
 h = f + g
 
-subtrees = h.structure.get_subtrees_below_root()
-for tree in subtrees:
-    print(tree)
+for x in [f,g]:
+    print(x)
+    print()
+    print(x.structure)
     print()
 
-# descendants = h.structure.get_descendants(h.structure.root)
-# stems = h.structure.get_children(h.structure.root)
-# for stem in stems:
-#     print(stem)
-#     print()
+print(h)
+print()
+print(h.structure)
