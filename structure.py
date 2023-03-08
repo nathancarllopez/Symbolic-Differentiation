@@ -75,9 +75,9 @@ class AlgebraicStructure(WeightedGraph):
     
     def get_descendants(self, vertex):
         descendants = self.get_children(vertex)
-        if len(descendants) == 0:
-            return [vertex]
         next_generation = []
+        if len(descendants) == 0:
+            return next_generation
         for child in descendants:
             next_generation.extend(self.get_descendants(child))
         return next_generation

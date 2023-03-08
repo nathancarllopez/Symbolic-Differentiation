@@ -156,12 +156,10 @@ f = Exponential('x', 3, 5)
 g = Polynomial('x', [2, 0, -1])
 h = f + g
 
-for x in [f,g]:
-    print(x)
-    print()
-    print(x.structure)
-    print()
+h_tree = h.structure
 
-print(h)
-print()
-print(h.structure)
+# print(h_tree.get_descendants(h_tree.root))
+# print(h_tree.get_children(h_tree.root))
+for stem in h_tree.get_children(h_tree.root):
+    print(stem)
+    print(h_tree.get_descendants(stem))
