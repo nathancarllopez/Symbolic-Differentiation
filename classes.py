@@ -202,17 +202,15 @@ class AlgebraicStructure():
         self.weights = {edge: None for edge in self.edges}
 
     def __str__(self):
-        vertices_str = 'The vertices of the graph are '
-        vertices_str += ', '.join(list(map(str, self.vertices))) + '.\n'
-
-        if len(self.edges) > 0:
-            edges_str = 'The edges of the graph are '
-            unpacked_edges = [(str(edge[0]), str(edge[1])) for edge in self.edges]
-            edges_str += ', '.join(unpacked_edges) + '.'
+        if self.root in ['+', '*', '-', '/', 'compose']:
+            root_str = 'The root of the graph is '
+            root_str += self.root + '.'
+            stem_str = 'The first stem is ' + type(self.self_child).__str__(self.self_child) + '.\n'
+            stem_str += 'The second stem is ' + type(self.other_child).__str__(self.other_child) + '.'
+            return root_str + '\n' + stem_str
         else:
-            edges_str = 'There are no edges.'
-
-        return vertices_str + edges_str
+            root_str = type(self.root).__str__(self.root)
+            return root_str
 
     def unpack(self):
         '''
