@@ -158,30 +158,6 @@ class DifferentiableFunction():
     
     def differentiate(self):
         return AlgebraicStructure.differentiate(self.structure)
-        # if tree.root in ['+', '*', '-', '/', 'compose']:
-        #     self_child, other_child = AlgebraicStructure.getChildren(tree)
-
-
-        #     ## What happens if the children are also trees? ##
-        #     if type(self_child) is AlgebraicStructure:
-        #         self_child = AlgebraicStructure.genFunction(self_child)
-        #     if type(other_child) is AlgebraicStructure:
-        #         other_child = AlgebraicStructure.genFunction(other_child)
-        #     ## ##
-
-        #     if tree.root == '+':
-        #         return DifferentiableFunction.differentiate(self_child) + DifferentiableFunction.differentiate(other_child)
-        #     if tree.root == '-':
-        #         return DifferentiableFunction.differentiate(self_child) - DifferentiableFunction.differentiate(other_child)
-        #     if tree.root == '*':
-        #         return DifferentiableFunction.productRule(self_child, other_child)
-        #     if tree.root == '/':
-        #         return DifferentiableFunction.quotientRule(self_child, other_child)
-        #     if tree.root == 'compose':
-        #         return DifferentiableFunction.chainRule(self_child, other_child)
-        # else:
-        #     root_type = type(tree.root)
-        #     return root_type.derivative(tree.root)
 
 
 class AlgebraicStructure():
@@ -203,14 +179,30 @@ class AlgebraicStructure():
 
     def __str__(self):
         if self.root in ['+', '*', '-', '/', 'compose']:
-            root_str = 'The root of the graph is '
-            root_str += self.root + '.'
-            stem_str = 'The first stem is ' + type(self.self_child).__str__(self.self_child) + '.\n'
-            stem_str += 'The second stem is ' + type(self.other_child).__str__(self.other_child) + '.'
-            return root_str + '\n' + stem_str
+            root_str = 'The root of the graph is ' + self.root + '.\n'
+            if type(self.self_child) is AlgebraicStructure:
+                if type(self.other_child) is AlgebraicStructure:
+                    # both children are structures
+                    stem_str = 'Both stems are algebraic structures.'
+                    return root_str + stem_str
+                else:
+                    # self is a structure, other is a function
+                    self_stem_str = 'The first stem is an algebraic structure.\n'
+                    other_stem_str = 'The second stem is the function ' + type(self.other_child).__str__(self.other_child) + '.'
+                    return root_str + self_stem_str + other_stem_str
+            else:
+                if type(self.other_child) is AlgebraicStructure:
+                    # self is a function, other is a structure
+                    self_stem_str = 'The first stem is the function ' + type(self.self_child).__str__(self.self_child) + '.\n'
+                    other_stem_str = 'The second stem is an algebraic structure.'
+                    return root_str + self_stem_str + other_stem_str
+                else:
+                    # both children are functions
+                    self_stem_str = 'The first stem is the function ' + type(self.self_child).__str__(self.self_child) + '.\n'
+                    other_stem_str = 'The second stem is the function ' + type(self.other_child).__str__(self.other_child) + '.'
+                    return root_str + self_stem_str + other_stem_str
         else:
-            root_str = type(self.root).__str__(self.root)
-            return root_str
+            return type(self.root).__str__(self.root)
 
     def unpack(self):
         '''
@@ -220,8 +212,8 @@ class AlgebraicStructure():
         operation = self.root
         if operation in ['+', '*', '-', '/', 'compose']:
             self_child, other_child = self.self_child, self.other_child
-            if self_child is AlgebraicStructure:
-                if other_child is AlgebraicStructure:
+            if type(self_child) is AlgebraicStructure:
+                if type(other_child) is AlgebraicStructure:
                     # both children are structures
                     if operation == '+':
                         return AlgebraicStructure.unpack(self_child) + AlgebraicStructure.unpack(other_child)
@@ -246,7 +238,7 @@ class AlgebraicStructure():
                     if operation == 'compose':
                         return DifferentiableFunction.compose(AlgebraicStructure.unpack(self_child), other_child)
             else:
-                if other_child is AlgebraicStructure:
+                if type(other_child) is AlgebraicStructure:
                     # self is a function, other is a structure
                     if operation == '+':
                         return self_child + AlgebraicStructure.unpack(other_child)
@@ -311,8 +303,8 @@ class AlgebraicStructure():
         operation = self.root
         if operation in ['+', '*', '-', '/', 'compose']:
             self_child, other_child = self.self_child, self.other_child
-            if self_child is AlgebraicStructure:
-                if other_child is AlgebraicStructure:
+            if type(self_child) is AlgebraicStructure:
+                if type(other_child) is AlgebraicStructure:
                     # Both children are algebraic structures
                     return AlgebraicStructure.applyDerRule(self_child, other_child, operation)
                 else:
@@ -337,7 +329,7 @@ class AlgebraicStructure():
                         second_term = type(other_child).derivative(other_child)
                         return first_term * second_term
             else:
-                if other_child is AlgebraicStructure:
+                if type(other_child) is AlgebraicStructure:
                     # self is a function, other is a structure
                     if operation == '+':
                         return type(self_child).derivative(self_child) + AlgebraicStructure.differentiate(other_child)
