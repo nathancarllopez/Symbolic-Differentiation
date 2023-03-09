@@ -158,7 +158,61 @@ class AlgebraicStructure():
         Returns a differentiable function f with the property
         that f.structure = self
         '''
-        pass
+        operation = self.root
+        if operation in ['+', '*', '-', '/', 'compose']:
+            self_child, other_child = self.self_child, self.other_child
+            if self_child is AlgebraicStructure:
+                if other_child is AlgebraicStructure:
+                    # both children are structures
+                    if operation == '+':
+                        return AlgebraicStructure.unpack(self_child) + AlgebraicStructure.unpack(other_child)
+                    if operation == '-':
+                        return AlgebraicStructure.unpack(self_child) - AlgebraicStructure.unpack(other_child)
+                    if operation == '*':
+                        return AlgebraicStructure.unpack(self_child) * AlgebraicStructure.unpack(other_child)
+                    if operation == '/':
+                        return AlgebraicStructure.unpack(self_child) / AlgebraicStructure.unpack(other_child)
+                    if operation == 'compose':
+                        return DifferentiableFunction.compose(AlgebraicStructure.unpack(self_child), AlgebraicStructure.unpack(other_child))
+                else:
+                    # self is a structure, other is a function
+                    if operation == '+':
+                        return AlgebraicStructure.unpack(self_child) + other_child
+                    if operation == '-':
+                        return AlgebraicStructure.unpack(self_child) - other_child
+                    if operation == '*':
+                        return AlgebraicStructure.unpack(self_child) * other_child
+                    if operation == '/':
+                        return AlgebraicStructure.unpack(self_child) / other_child
+                    if operation == 'compose':
+                        return DifferentiableFunction.compose(AlgebraicStructure.unpack(self_child), other_child)
+            else:
+                if other_child is AlgebraicStructure:
+                    # self is a function, other is a structure
+                    if operation == '+':
+                        return self_child + AlgebraicStructure.unpack(other_child)
+                    if operation == '-':
+                        return self_child - AlgebraicStructure.unpack(other_child)
+                    if operation == '*':
+                        return self_child * AlgebraicStructure.unpack(other_child)
+                    if operation == '/':
+                        return self_child / AlgebraicStructure.unpack(other_child)
+                    if operation == 'compose':
+                        return DifferentiableFunction.compose(self_child, AlgebraicStructure.unpack(other_child))
+                else:
+                    # both children are functions
+                    if operation == '+':
+                        return self_child + other_child
+                    if operation == '-':
+                        return self_child - other_child
+                    if operation == '*':
+                        return self_child * other_child
+                    if operation == '/':
+                        return self_child / other_child
+                    if operation == 'compose':
+                        return DifferentiableFunction.compose(self_child, other_child)
+        else:
+            return operation
 
     ####################
     ## Calculus Rules ##
@@ -287,7 +341,7 @@ class AlgebraicStructure():
         c.changeWeight((c.root, self), 'self')
         c.changeWeight((c.root, other), 'other')
         return c
-    
+
 
 class Exponential(DifferentiableFunction):
     def __init__(self, argument, coeff, base):
