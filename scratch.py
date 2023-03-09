@@ -7,3 +7,8 @@ sin = c.Trigonometric('x', 2, 's')
 f = poly + exp
 g = poly + exp + sin
 h = f + sin
+
+for x in [f,g,h]:
+    print("original:", x)
+    print("derivative:", x.differentiate())
+    print()
