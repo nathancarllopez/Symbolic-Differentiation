@@ -1,13 +1,11 @@
-import basicfunctions
+import classes as c
 
-f = basicfunctions.Exponential('x', 3, 5)
-g = basicfunctions.Polynomial('x', [2,0,3,-1])
-h = f+g
-hTree = h.structure
-print(hTree)
-k = h+h
-print()
-kTree = k.structure
-print(kTree)
-print()
-print(kTree.get_subtrees_below_root())
+poly = c.Polynomial('x', [1, 5, 0, -3])
+exp = c.Exponential('x', 2, 2)
+sin = c.Trigonometric('x', 2, 's')
+
+for x in [poly, exp, sin]:
+    print(x)
+
+f = poly + exp
+print(f.structure)
