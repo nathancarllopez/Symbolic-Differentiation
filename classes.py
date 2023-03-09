@@ -23,6 +23,67 @@ class DifferentiableFunction():
         self.rule = rule
         self.structure = structure
 
+    def __str__(self):
+        operation = self.structure.root
+        if operation in ['+', '-', '*', '/', 'compose']:
+            self_child, other_child = self.structure.self_child, self.structure.other_child
+            if type(self_child) is AlgebraicStructure:
+                if type(other_child) is AlgebraicStructure:
+                    # both children are structures
+                    self_child_function = AlgebraicStructure.unpack(self_child)
+                    other_child_function = AlgebraicStructure.unpack(other_child)
+                    if operation == '+':
+                        return DifferentiableFunction.__str__(self_child_function) + ' + ' + DifferentiableFunction.__str__(other_child_function)
+                    if operation == '-':
+                        return DifferentiableFunction.__str__(self_child_function) + ' - ' + DifferentiableFunction.__str__(other_child_function)
+                    if operation == '*':
+                        return '(' + DifferentiableFunction.__str__(self_child_function) + ')(' + DifferentiableFunction.__str__(other_child_function) + ')'
+                    if operation == '/':
+                        return '(' + DifferentiableFunction.__str__(self_child_function) + ') / (' + DifferentiableFunction.__str__(other_child_function) + ')'
+                    if operation == 'compose':
+                        return "I'm not sure about this one yet"
+                else:
+                    # self is a structure, other is a function
+                    self_child_function = AlgebraicStructure.unpack(self_child)
+                    if operation == '+':
+                        return DifferentiableFunction.__str__(self_child_function) + ' + ' + DifferentiableFunction.__str__(other_child)
+                    if operation == '-':
+                        return DifferentiableFunction.__str__(self_child_function) + ' - ' + DifferentiableFunction.__str__(other_child)
+                    if operation == '*':
+                        return '(' + DifferentiableFunction.__str__(self_child_function) + ')(' + DifferentiableFunction.__str__(other_child) + ')'
+                    if operation == '/':
+                        return '(' + DifferentiableFunction.__str__(self_child_function) + ') / (' + DifferentiableFunction.__str__(other_child) + ')'
+                    if operation == 'compose':
+                        return "I'm not sure about this one yet"
+            else:
+                if type(other_child) is AlgebraicStructure:
+                    # self is a function, other is a structure
+                    other_child_function = AlgebraicStructure.unpack(other_child)
+                    if operation == '+':
+                        return DifferentiableFunction.__str__(self_child) + ' + ' + DifferentiableFunction.__str__(other_child_function)
+                    if operation == '-':
+                        return DifferentiableFunction.__str__(self_child) + ' - ' + DifferentiableFunction.__str__(other_child_function)
+                    if operation == '*':
+                        return '(' + DifferentiableFunction.__str__(self_child) + ')(' + DifferentiableFunction.__str__(other_child_function) + ')'
+                    if operation == '/':
+                        return '(' + DifferentiableFunction.__str__(self_child) + ') / (' + DifferentiableFunction.__str__(other_child_function) + ')'
+                    if operation == 'compose':
+                        return "I'm not sure about this one yet"
+                else:
+                    # both children are functions
+                    if operation == '+':
+                        return DifferentiableFunction.__str__(self_child) + ' + ' + DifferentiableFunction.__str__(other_child)
+                    if operation == '-':
+                        return DifferentiableFunction.__str__(self_child) + ' - ' + DifferentiableFunction.__str__(other_child)
+                    if operation == '*':
+                        return '(' + DifferentiableFunction.__str__(self_child) + ')(' + DifferentiableFunction.__str__(other_child) + ')'
+                    if operation == '/':
+                        return '(' + DifferentiableFunction.__str__(self_child) + ') / (' + DifferentiableFunction.__str__(other_child) + ')'
+                    if operation == 'compose':
+                        return "I'm not sure about this one yet"
+        else:
+            return str(operation)
+
     ##########################
     ## Algebraic Operations ##
     ##########################
