@@ -1,14 +1,6 @@
-import classes as c
+import thirdtry as T
 
-poly = c.Polynomial('x', [1, 5, 0, -3])
-exp = c.Exponential('x', 2, 2)
-sin = c.Trigonometric('x', 2, 's')
+poly = T.Polynomial([2, 0, -1, 3])
+exp = T.Exponential(3, 5)
+sin = T.Trigonometric(1, 's')
 
-f = poly + exp
-g = poly + exp + sin
-h = f + sin
-
-for x in [f,g,h]:
-    print("original:", x)
-    print("derivative:", x.differentiate())
-    print()

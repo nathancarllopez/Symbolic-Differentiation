@@ -89,28 +89,24 @@ class DifferentiableFunction():
     ##########################
 
     def __add__(self, other):
-        assert self.argument == other.argument, "Arguments need to match"
         s_rule = lambda x: self.rule(x) + other.rule(x)
         s_structure = self.structure + other.structure
         s = DifferentiableFunction(self.argument, s_rule, s_structure)
         return s
     
     def __mul__(self, other):
-        assert self.argument == other.argument, "Arguments need to match"
         m_rule = lambda x: self.rule(x) * other.rule(x)
         m_structure = self.structure * other.structure
         m = DifferentiableFunction(self.argument, m_rule, m_structure)
         return m
     
     def __sub__(self, other):
-        assert self.argument == other.argument, "Arguments need to match"
         d_rule = lambda x: self.rule(x) - other.rule(x)
         d_structure = self.structure - other.structure
         d = DifferentiableFunction(self.argument, d_rule, d_structure)
         return d
     
     def __truediv__(self, other):
-        assert self.argument == other.argument, "Arguments need to match"
         f_rule = lambda x: self.rule(x) / other.rule(x)
         f_structure = self.structure / other.structure
         f = DifferentiableFunction(self.argument, f_rule, f_structure)
@@ -180,8 +176,8 @@ class AlgebraicStructure():
     def __str__(self):
         if self.root in ['+', '*', '-', '/', 'compose']:
             root_str = 'The root of the graph is ' + self.root + '.\n'
-            if type(self.self_child) is AlgebraicStructure:
-                if type(self.other_child) is AlgebraicStructure:
+            if type(self.self_child.root) is AlgebraicStructure:
+                if type(self.other_child.root) is AlgebraicStructure:
                     # both children are structures
                     stem_str = 'Both stems are algebraic structures.'
                     return root_str + stem_str
@@ -191,7 +187,7 @@ class AlgebraicStructure():
                     other_stem_str = 'The second stem is the function ' + type(self.other_child).__str__(self.other_child) + '.'
                     return root_str + self_stem_str + other_stem_str
             else:
-                if type(self.other_child) is AlgebraicStructure:
+                if type(self.other_child.root) is AlgebraicStructure:
                     # self is a function, other is a structure
                     self_stem_str = 'The first stem is the function ' + type(self.self_child).__str__(self.self_child) + '.\n'
                     other_stem_str = 'The second stem is an algebraic structure.'
