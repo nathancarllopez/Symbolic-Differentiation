@@ -91,21 +91,21 @@ class DifferentiableFunction():
     ####################
 
     def productRule(self, other):
-        first_term = type(self).derivative(self) * other
-        second_term = self * type(other).derivative(other)
+        first_term = DifferentiableFunction.differentiate(self) * other
+        second_term = self * DifferentiableFunction.differentiate(other)
         return first_term + second_term
 
     def quotientRule(self, other):
-        first_num = type(self).derivative(self) * other
-        second_num = self * type(other).derivative(other)
+        first_num = DifferentiableFunction.differentiate(self) * other
+        second_num = self * DifferentiableFunction.differentiate(other)
         num = first_num - second_num
         denom = other * other
         return num / denom
 
     def chainRule(self, other):
-        deriv_outside = type(self).derivative(self)
+        deriv_outside = DifferentiableFunction.differentiate(self)
         first_term = DifferentiableFunction.compose(deriv_outside, other)
-        second_term = type(other).derivative(other)
+        second_term = DifferentiableFunction.differentiate(other)
         return first_term * second_term
 
     def applyDerRule(self, other, operation):
@@ -121,7 +121,14 @@ class DifferentiableFunction():
         return rule_dict[operation](self, other)
     
     def differentiate(self):
-        pass
+        stack = self.structure.copy()
+        operation = stack.pop()
+        if operation in ['+', '-', '*', '/', 'compose']:
+            first = stack.pop()
+            second = stack.pop()
+            return DifferentiableFunction.applyDerRule(first, second, operation)
+        else:
+            return type(operation).derivative(operation)
 
 
 class Polynomial(DifferentiableFunction):
@@ -145,7 +152,10 @@ class Polynomial(DifferentiableFunction):
 
     def __str__(self):
         if len(self.argument) > 1:
-            self.argument = '(' + self.argument + ')'
+            argument = '(' + self.argument + ')'
+        else:
+            argument = self.argument
+
         result = ''
         for position, coeff in enumerate(self.coeffs):
             power = len(self.coeffs) - 1 - position
@@ -154,53 +164,53 @@ class Polynomial(DifferentiableFunction):
             if power > 1:
                 if result == '':
                     if coeff == 1:
-                        first_term = str(self.argument) + '^' + str(power)
+                        first_term = argument + '^' + str(power)
                         result = first_term
                     elif coeff == -1:
-                        first_term = '-' + str(self.argument) + '^' + str(power)
+                        first_term = '-' + argument + '^' + str(power)
                         result = first_term
                     else:
-                        first_term = str(coeff) + str(self.argument) + '^' + str(power)
+                        first_term = str(coeff) + argument + '^' + str(power)
                         result = first_term
                 else:
                     if coeff > 0:
                         result += ' + '
                         if coeff == 1:
-                            result += str(self.argument) + '^' + str(power)
+                            result += argument + '^' + str(power)
                         else:
-                            result += str(coeff) + str(self.argument) + '^' + str(power)
+                            result += str(coeff) + argument + '^' + str(power)
                     else:
                         result += ' - '
                         if coeff == -1:
-                            result += str(self.argument) + '^' + str(power)
+                            result += argument + '^' + str(power)
                         else:
                             coeff = -coeff
-                            result += str(coeff) + str(self.argument) + '^' + str(power)
+                            result += str(coeff) + argument + '^' + str(power)
             elif power == 1:
                 if result == '':
                     if coeff == 1:
-                        first_term = str(self.argument)
+                        first_term = argument
                         result = first_term
                     elif coeff == -1:
-                        first_term = '-' + str(self.argument)
+                        first_term = '-' + argument
                         result = first_term
                     else:
-                        first_term = str(coeff) + str(self.argument)
+                        first_term = str(coeff) + argument
                         result = first_term
                 else:
                     if coeff > 0:
                         result += ' + '
                         if coeff == 1:
-                            result += str(self.argument)
+                            result += argument
                         else:
-                            result += str(coeff) + str(self.argument)
+                            result += str(coeff) + argument
                     else:
                         result += ' - '
                         if coeff == -1:
-                            result += str(self.argument)
+                            result += argument
                         else:
                             coeff = -coeff
-                            result += str(coeff) + str(self.argument)
+                            result += str(coeff) + argument
             else:
                 if result == '':
                     result = str(coeff)
@@ -218,7 +228,7 @@ class Polynomial(DifferentiableFunction):
             power = len(self.coeffs) - 1 - position
             deriv_coeffs.append(power * coeff)
         deriv_coeffs.pop()
-        return Polynomial(self.argument, deriv_coeffs)
+        return Polynomial(deriv_coeffs, self.argument)
 
 
 class Exponential(DifferentiableFunction):
@@ -239,15 +249,20 @@ class Exponential(DifferentiableFunction):
 
     def __str__(self):
         if len(self.argument) > 1:
-            self.argument = '(' + self.argument + ')'
+            argument = '(' + self.argument + ')'
+        else:
+            argument = self.argument
+
         if self.base == 1:
             return str(self.coeff)
         if self.coeff == 1:
-            return str(self.base) + '^' + str(self.argument)
-        return str(self.coeff) + '*' + str(self.base) + '^' + str(self.argument)
+            return str(self.base) + '^' + argument
+        if self.coeff == -1:
+            return '-(' + str(self.base) + ')^' + argument
+        return str(self.coeff) + '*' + str(self.base) + '^' + argument
     
     def derivative(self):
-        return Exponential(self.argument, round(self.coeff * math.log(self.base), 2), self.base)
+        return Exponential(round(self.coeff * math.log(self.base), 2), self.base, self.argument)
         
 
 class Trigonometric(DifferentiableFunction):
@@ -278,16 +293,63 @@ class Trigonometric(DifferentiableFunction):
 
     def __str__(self):
         if len(self.argument) > 1:
-            self.argument = '(' + self.argument + ')'
+            argument = '(' + self.argument + ')'
+        else:
+            argument = self.argument
+
         if self.flavor == 's':
             if self.coeff == 1:
-                return 'sin(' + str(self.argument) + ')'
-            return str(self.coeff) + '*sin(' + str(self.argument) + ')'
+                return 'sin(' + argument + ')'
+            if self.coeff == -1:
+                return '-sin(' + argument + ')'
+            return str(self.coeff) + '*sin(' + argument + ')'
+        
         if self.coeff == 1:
-            return 'cos(' + str(self.argument) + ')'
-        return str(self.coeff) + '*cos(' + str(self.argument) + ')'
+            return 'cos(' + argument + ')'
+        if self.coeff == -1:
+            return '-cos(' + argument + ')'
+        return str(self.coeff) + '*cos(' + argument + ')'
 
     def derivative(self):
         if self.flavor == 's':
-            return Trigonometric(self.argument, self.coeff, 'c')
-        return Trigonometric(self.argument, -self.coeff, 's')
+            return Trigonometric(self.coeff, 'c', self.argument)
+        return Trigonometric(-self.coeff, 's', self.argument)
+    
+
+class RealPowers(DifferentiableFunction):
+    def __init__(self, coeff, exponent, argument='x'):
+        self.coeff = coeff
+        self.exponent = exponent
+        structure = [self]
+        DifferentiableFunction.__init__(
+            self,
+            argument,
+            lambda x: x ** exponent,
+            structure
+        )
+
+    def compose(self, argument):
+        return RealPowers(self.coeff, self.exponent, argument)
+    
+    def __str__(self):
+        if self.coeff == 1:
+            if len(self.argument) > 1:
+                argument = '(' + self.argument + ')'
+                return argument + '^' + str(self.exponent)
+            return self.argument + '^' + str(self.exponent)
+        elif self.coeff == -1:
+            if len(self.argument) > 1:
+                argument = '-(' + self.argument + ')'
+                return argument + '^' + str(self.exponent)
+            return '-' + self.argument + '^' + str(self.exponent)
+        else:
+            coeff = str(self.coeff)
+            if len(self.argument) > 1:
+                argument = '(' + self.argument + ')'
+                return coeff + '*' + argument + '^' + str(self.exponent)
+            return coeff + '*' + self.argument + '^' + str(self.exponent)
+    
+    def derivative(self):
+        coeff = self.coeff * self.exponent
+        exponent = self.exponent - 1
+        return RealPowers(coeff, exponent, self.argument)
