@@ -1,14 +1,19 @@
+import math
 import thirdtry as T
 
-poly = T.Polynomial([2, 0, 3, -1])
-exp = T.Exponential(3, 5)
+cubed = T.RealPowers(1, 3)
+ln = T.Logarithms(math.e)
+poly = T.Polynomial([5, 0, 9])
 
-f = poly + exp
-g = poly * exp
-h = poly / exp
-k = T.DifferentiableFunction.compose(poly, exp)
+# F = ln(5x^2 + 9)^3
+f = T.DifferentiableFunction.compose(ln, poly)
+g = T.DifferentiableFunction.compose(cubed, f)
 
-for x in [f,g,h,k]:
-    print("Original\n", x)
-    print("Derivative\n", x.differentiate())
-    print()
+print("Original\n", f)
+print("Derivative\n", f.differentiate())
+# print()
+# print("Original\n", g)
+# print("Derivative\n", g.differentiate())
+
+print("original\n", ln)
+print("derivative\n", ln.differentiate())

@@ -292,10 +292,7 @@ class Trigonometric(DifferentiableFunction):
         return Trigonometric(self.coeff, self.flavor, argument)
 
     def __str__(self):
-        if len(self.argument) > 1:
-            argument = '(' + self.argument + ')'
-        else:
-            argument = self.argument
+        argument = self.argument
 
         if self.flavor == 's':
             if self.coeff == 1:
@@ -332,24 +329,54 @@ class RealPowers(DifferentiableFunction):
         return RealPowers(self.coeff, self.exponent, argument)
     
     def __str__(self):
+        if len(self.argument) > 1:
+            argument = '(' + self.argument + ')'
+        else:
+            argument = self.argument
+
         if self.coeff == 1:
-            if len(self.argument) > 1:
-                argument = '(' + self.argument + ')'
-                return argument + '^' + str(self.exponent)
-            return self.argument + '^' + str(self.exponent)
-        elif self.coeff == -1:
-            if len(self.argument) > 1:
-                argument = '-(' + self.argument + ')'
-                return argument + '^' + str(self.exponent)
-            return '-' + self.argument + '^' + str(self.exponent)
+            return argument + '^' + str(self.exponent)
+        if self.coeff == -1:
+            return '-' + argument + '^' + str(self.exponent)
         else:
             coeff = str(self.coeff)
-            if len(self.argument) > 1:
-                argument = '(' + self.argument + ')'
-                return coeff + '*' + argument + '^' + str(self.exponent)
-            return coeff + '*' + self.argument + '^' + str(self.exponent)
+            return coeff + '*' + argument + '^' + str(self.exponent)
     
     def derivative(self):
         coeff = self.coeff * self.exponent
         exponent = self.exponent - 1
         return RealPowers(coeff, exponent, self.argument)
+
+
+class Logarithms(DifferentiableFunction):
+    def __init__(self, base, argument='x'):
+        self.base = base
+        structure = [self]
+        DifferentiableFunction.__init__(
+            self,
+            argument,
+            lambda x: math.log(x, base),
+            structure
+        )
+
+    def compose(self, argument):
+        return Logarithms(self.base, argument)
+    
+    def __str__(self):
+        argument = '(' + self.argument + ')'
+        # natural log
+        if self.base == math.e:
+            return 'ln' + argument
+        # base 2
+        if self.base == 2:
+            return 'lg' + argument
+        # common log
+        if self.base == 10:
+            return 'log' + argument
+        return 'log_' + str(self.base) + argument
+
+    def derivative(self):
+        numerator = Polynomial([1])
+        denominator = Polynomial([math.log(self.base), 0])
+        return numerator/denominator
+
